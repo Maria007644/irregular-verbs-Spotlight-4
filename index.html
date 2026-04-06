@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Space Mission: Irregular Verbs</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --space-dark:#050a18; --neon-cyan:#00e5ff; --neon-purple:#b24bff;
+    --neon-green:#39ff14; --neon-orange:#ff6b00; --star-white:#e8f4ff;
+    --text-dim:#6a8ab5; --panel-bg:rgba(10,22,40,0.85);
+    --card-border:rgba(0,229,255,0.18); --card-hover:rgba(0,229,255,0.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Exo 2',sans-serif;background:var(--space-dark);color:var(--star-white);min-height:100vh;overflow-x:hidden;}
+  .stars-bg{
+    position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(1px 1px at 10% 15%,rgba(255,255,255,.8) 0%,transparent 100%),
+      radial-gradient(1px 1px at 25% 40%,rgba(255,255,255,.6) 0%,transparent 100%),
+      radial-gradient(1.5px 1.5px at 45% 8%,rgba(255,255,255,.9) 0%,transparent 100%),
+      radial-gradient(1px 1px at 60% 55%,rgba(255,255,255,.5) 0%,transparent 100%),
+      radial-gradient(1px 1px at 75% 22%,rgba(255,255,255,.7) 0%,transparent 100%),
+      radial-gradient(1.5px 1.5px at 88% 70%,rgba(255,255,255,.8) 0%,transparent 100%),
+      radial-gradient(1px 1px at 15% 75%,rgba(255,255,255,.4) 0%,transparent 100%),
+      radial-gradient(1px 1px at 35% 90%,rgba(255,255,255,.6) 0%,transparent 100%),
+      radial-gradient(1px 1px at 55% 78%,rgba(255,255,255,.5) 0%,transparent 100%),
+      radial-gradient(1px 1px at 92% 35%,rgba(255,255,255,.7) 0%,transparent 100%),
+      radial-gradient(1px 1px at 5% 50%,rgba(255,255,255,.4) 0%,transparent 100%),
+      radial-gradient(1px 1px at 70% 88%,rgba(255,255,255,.6) 0%,transparent 100%),
+      radial-gradient(1.5px 1.5px at 30% 60%,rgba(200,220,255,.6) 0%,transparent 100%),
+      radial-gradient(1px 1px at 48% 30%,rgba(255,255,255,.4) 0%,transparent 100%);
+    background-color:var(--space-dark);
+  }
+  .nebula{
+    position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(ellipse 600px 300px at 80% 20%,rgba(88,28,135,.12) 0%,transparent 70%),
+      radial-gradient(ellipse 500px 400px at 10% 70%,rgba(0,100,160,.1) 0%,transparent 70%),
+      radial-gradient(ellipse 400px 200px at 50% 95%,rgba(0,229,255,.05) 0%,transparent 70%);
+  }
+  .page{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+  .header{text-align:center;margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid rgba(0,229,255,.15);}
+  .mission-badge{
+    display:inline-block;font-family:'Orbitron',monospace;font-size:11px;font-weight:600;
+    letter-spacing:3px;color:var(--neon-cyan);text-transform:uppercase;
+    border:1px solid rgba(0,229,255,.4);border-radius:20px;padding:5px 16px;
+    margin-bottom:1.2rem;background:rgba(0,229,255,.05);
+  }
+  h1{
+    font-family:'Orbitron',monospace;font-size:clamp(22px,5vw,36px);font-weight:900;
+    letter-spacing:2px;color:var(--star-white);line-height:1.2;
+    text-shadow:0 0 40px rgba(0,229,255,.3);margin-bottom:.6rem;
+  }
+  h1 span{color:var(--neon-cyan);}
+  .subtitle{font-size:14px;color:var(--text-dim);letter-spacing:1px;}
+  .score-bar{display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:2rem;flex-wrap:wrap;}
+  .score-pill{
+    font-family:'Orbitron',monospace;font-size:12px;background:var(--panel-bg);
+    border:1px solid var(--card-border);border-radius:20px;padding:8px 20px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .score-pill .val{color:var(--neon-cyan);font-size:16px;font-weight:700;}
+  .score-pill .lbl{color:var(--text-dim);font-size:11px;}
+  .nav-tabs{
+    display:flex;gap:4px;margin-bottom:2rem;background:rgba(10,22,40,.6);
+    border:1px solid rgba(0,229,255,.12);border-radius:14px;padding:5px;flex-wrap:wrap;
+  }
+  .tab-btn{
+    flex:1;min-width:110px;padding:10px 10px;font-family:'Exo 2',sans-serif;
+    font-size:12px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;
+    background:transparent;border:none;border-radius:10px;color:var(--text-dim);
+    cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;
+  }
+  .tab-btn:hover{color:var(--star-white);background:rgba(0,229,255,.06);}
+  .tab-btn.active{background:rgba(0,229,255,.12);color:var(--neon-cyan);border:1px solid rgba(0,229,255,.3);}
+  .exercise{display:none;}
+  .exercise.active{display:block;animation:fadeIn .3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .ex-header{margin-bottom:1.5rem;}
+  .ex-title{
+    font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--star-white);
+    margin-bottom:6px;display:flex;align-items:center;gap:10px;
+  }
+  .ex-desc{font-size:13px;color:var(--text-dim);line-height:1.6;}
+  .card{
+    background:var(--panel-bg);border:1px solid var(--card-border);
+    border-radius:14px;padding:16px 18px;margin-bottom:10px;transition:border-color .2s;
+  }
+  .card:hover{border-color:rgba(0,229,255,.3);}
+  input[type="text"]{
+    background:rgba(255,255,255,.05);border:1px solid rgba(0,229,255,.25);
+    border-radius:8px;padding:7px 12px;font-size:14px;
+    font-family:'Exo 2',sans-serif;color:var(--star-white);outline:none;transition:border-color .2s;
+  }
+  input[type="text"]:focus{border-color:var(--neon-cyan);background:rgba(0,229,255,.05);}
+  input[type="text"].correct{border-color:var(--neon-green);background:rgba(57,255,20,.06);color:#39ff14;}
+  input[type="text"].wrong{border-color:#ff4444;background:rgba(255,68,68,.07);color:#ff6b6b;}
+  .sentence{font-size:15px;color:var(--star-white);line-height:1.8;display:flex;align-items:center;flex-wrap:wrap;gap:5px;}
+  .hint-pill{
+    font-size:12px;color:var(--text-dim);background:rgba(255,255,255,.05);
+    border-radius:6px;padding:2px 8px;border:1px solid rgba(255,255,255,.08);margin-left:4px;
+  }
+  .check-btn{
+    margin-top:1.5rem;padding:12px 28px;font-family:'Orbitron',monospace;
+    font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+    background:transparent;border:1.5px solid var(--neon-cyan);color:var(--neon-cyan);
+    border-radius:10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;
+  }
+  .check-btn:hover{background:rgba(0,229,255,.1);box-shadow:0 0 20px rgba(0,229,255,.2);}
+  .check-btn:active{transform:scale(.98);}
+  .result-msg{margin-top:1rem;font-size:14px;font-weight:500;padding:10px 16px;border-radius:8px;display:none;}
+  .result-msg.show{display:block;}
+  .result-msg.good{background:rgba(57,255,20,.08);border:1px solid rgba(57,255,20,.3);color:#39ff14;}
+  .result-msg.ok{background:rgba(255,165,0,.08);border:1px solid rgba(255,165,0,.3);color:#ffa500;}
+  .result-msg.bad{background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.3);color:#ff6b6b;}
+  .transform-original{
+    font-size:14px;color:var(--neon-cyan);margin-bottom:10px;padding:8px 14px;
+    background:rgba(0,229,255,.06);border-left:2px solid var(--neon-cyan);border-radius:0 8px 8px 0;
+  }
+  .transform-fields{display:flex;flex-direction:column;gap:8px;}
+  .field-row{display:flex;align-items:center;gap:10px;}
+  .field-label{
+    font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:1px;
+    min-width:26px;text-align:center;padding:4px 6px;border-radius:6px;
+  }
+  .lbl-neg{background:rgba(255,107,0,.15);color:var(--neon-orange);border:1px solid rgba(255,107,0,.3);}
+  .lbl-q{background:rgba(178,75,255,.15);color:var(--neon-purple);border:1px solid rgba(178,75,255,.3);}
+  .field-row input{flex:1;}
+  .wh-sentence{font-size:15px;color:var(--star-white);margin-bottom:10px;line-height:1.7;}
+  .highlight{color:var(--neon-purple);font-weight:600;text-decoration:underline;text-decoration-style:dotted;}
+  .match-area{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-bottom:1rem;}
+  .match-col{display:flex;flex-direction:column;gap:6px;}
+  .match-col-label{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);margin-bottom:4px;text-align:center;}
+  .match-card{
+    padding:12px 14px;background:var(--panel-bg);border:1px solid rgba(0,229,255,.15);
+    border-radius:10px;font-size:13px;color:var(--star-white);cursor:pointer;
+    transition:all .18s;line-height:1.5;user-select:none;min-height:48px;display:flex;align-items:center;
+  }
+  .match-card:hover{border-color:rgba(0,229,255,.4);background:var(--card-hover);}
+  .match-card.selected{border-color:var(--neon-cyan);background:rgba(0,229,255,.1);color:var(--neon-cyan);}
+  .match-card.matched{border-color:rgba(57,255,20,.5);background:rgba(57,255,20,.07);color:#39ff14;cursor:default;}
+  .match-card.wrong-flash{border-color:rgba(255,68,68,.6);background:rgba(255,68,68,.08);}
+  .match-pairs-done{font-size:13px;color:var(--text-dim);margin-top:8px;text-align:center;}
+  .story-box{
+    background:var(--panel-bg);border:1px solid var(--card-border);border-radius:14px;
+    padding:20px 22px;font-size:15px;line-height:2.6;color:var(--star-white);
+  }
+  .story-box input[type="text"]{width:84px;padding:4px 8px;font-size:13px;}
+  .word-bank{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.2rem;}
+  .word-chip{
+    font-family:'Orbitron',monospace;font-size:11px;font-weight:600;
+    padding:5px 12px;background:rgba(178,75,255,.1);border:1px solid rgba(178,75,255,.3);
+    border-radius:20px;color:var(--neon-purple);letter-spacing:.5px;
+  }
+  .astronaut-tip{
+    display:flex;gap:14px;align-items:flex-start;background:rgba(178,75,255,.07);
+    border:1px solid rgba(178,75,255,.2);border-radius:12px;padding:14px 16px;margin-bottom:1.5rem;
+  }
+  .astro-icon{font-size:26px;flex-shrink:0;}
+  .astro-text{font-size:13px;color:#c8aaff;line-height:1.6;}
+  @keyframes pulseGreen{0%{box-shadow:0 0 0 0 rgba(57,255,20,.4)}70%{box-shadow:0 0 0 8px rgba(57,255,20,0)}100%{box-shadow:0 0 0 0 rgba(57,255,20,0)}}
+  .pulse-green{animation:pulseGreen .5s ease;}
+  @media(max-width:600px){
+    .match-area{grid-template-columns:1fr;}
+    .tab-btn{min-width:80px;font-size:10px;padding:8px 6px;}
+    h1{font-size:22px;}
+  }
+</style>
+</head>
+<body>
+<div class="stars-bg"></div>
+<div class="nebula"></div>
+<div class="page">
+
+  <div class="header">
+    <div class="mission-badge">&#128640; Mission: English Grammar</div>
+    <h1>Space Cadet<br><span>Irregular Verbs</span></h1>
+    <p class="subtitle">Past Simple — 5 training modules for space explorers</p>
+  </div>
+
+  <div class="score-bar">
+    <div class="score-pill"><span class="lbl">Score</span><span class="val" id="total-score">0</span></div>
+    <div class="score-pill"><span class="lbl">Rank</span><span class="val" id="level-name">Cadet</span></div>
+    <div class="score-pill"><span class="lbl">Done</span><span class="val" id="done-count">0/5</span></div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showEx(0)"><span>&#9998;</span> Fill in V2</button>
+    <button class="tab-btn" onclick="showEx(1)"><span>&#9883;</span> Transform</button>
+    <button class="tab-btn" onclick="showEx(2)"><span>&#10067;</span> Questions</button>
+    <button class="tab-btn" onclick="showEx(3)"><span>&#128279;</span> Match</button>
+    <button class="tab-btn" onclick="showEx(4)"><span>&#128196;</span> Story</button>
+  </div>
+
+  <!-- EX 1 -->
+  <div class="exercise active" id="ex0">
+    <div class="ex-header">
+      <div class="ex-title">&#9998; Mission 1 — Fill in the verb (Past Simple)</div>
+      <div class="ex-desc">Write the correct Past Simple form. The base verb is shown in brackets.</div>
+    </div>
+    <div class="astronaut-tip">
+      <div class="astro-icon">&#128119;</div>
+      <div class="astro-text">Commander Zorin is reporting from the ISS. Fill in what the crew did yesterday!</div>
+    </div>
+    <div id="fill-list"></div>
+    <button class="check-btn" onclick="checkFill()">&#10003; Check answers</button>
+    <div class="result-msg" id="fill-result"></div>
+  </div>
+
+  <!-- EX 2 -->
+  <div class="exercise" id="ex1">
+    <div class="ex-header">
+      <div class="ex-title">&#9883; Mission 2 — Transform the sentence</div>
+      <div class="ex-desc">Read the positive sentence (in blue). Write the negative (–) and the question (?).</div>
+    </div>
+    <div class="astronaut-tip">
+      <div class="astro-icon">&#128302;</div>
+      <div class="astro-text">AI system ASTRA found errors in the ship's log. Fix each entry — add a negative and a question!</div>
+    </div>
+    <div id="transform-list"></div>
+    <button class="check-btn" onclick="checkTransform()">&#10003; Check answers</button>
+    <div class="result-msg" id="transform-result"></div>
+  </div>
+
+  <!-- EX 3 -->
+  <div class="exercise" id="ex2">
+    <div class="ex-header">
+      <div class="ex-title">&#128301; Mission 3 — Ask a question</div>
+      <div class="ex-desc">Ask a question about the <span style="color:var(--neon-purple)">underlined</span> word or phrase.</div>
+    </div>
+    <div class="astronaut-tip">
+      <div class="astro-icon">&#128126;</div>
+      <div class="astro-text">Alien researchers are very curious! Ask a question about each underlined part.</div>
+    </div>
+    <div id="wh-list"></div>
+    <button class="check-btn" onclick="checkWh()">&#10003; Check answers</button>
+    <div class="result-msg" id="wh-result"></div>
+  </div>
+
+  <!-- EX 4 -->
+  <div class="exercise" id="ex3">
+    <div class="ex-header">
+      <div class="ex-title">&#128279; Mission 4 — Match the sentence halves</div>
+      <div class="ex-desc">Click a sentence beginning on the left, then click the correct ending on the right.</div>
+    </div>
+    <div class="astronaut-tip">
+      <div class="astro-icon">&#128640;</div>
+      <div class="astro-text">A cosmic signal cut all the sentences in half! Help the crew put them back together.</div>
+    </div>
+    <div class="match-area">
+      <div class="match-col">
+        <div class="match-col-label">&#9654; Beginning</div>
+        <div id="match-left"></div>
+      </div>
+      <div class="match-col">
+        <div class="match-col-label">Ending &#9664;</div>
+        <div id="match-right"></div>
+      </div>
+    </div>
+    <div class="match-pairs-done" id="match-status">Matches: <span id="match-count">0</span> / 8</div>
+  </div>
+
+  <!-- EX 5 -->
+  <div class="exercise" id="ex4">
+    <div class="ex-header">
+      <div class="ex-title">&#128196; Mission 5 — Space diary</div>
+      <div class="ex-desc">Fill in the blanks with Past Simple. Use the words from the word bank.</div>
+    </div>
+    <div class="word-bank" id="word-bank"></div>
+    <div class="story-box" id="story-box"></div>
+    <button class="check-btn" onclick="checkStory()" style="margin-top:1.5rem">&#10003; Check answers</button>
+    <div class="result-msg" id="story-result"></div>
+  </div>
+
+</div>
+<script>
+const exScores=[0,0,0,0,0], exDone=[false,false,false,false,false];
+const levels=['Cadet','Pilot','Astronaut','Commander','Legend'];
+
+function updateScore(idx,pts){
+  exScores[idx]=pts; exDone[idx]=true;
+  document.getElementById('total-score').textContent=exScores.reduce((a,b)=>a+b,0);
+  document.getElementById('done-count').textContent=exDone.filter(Boolean).length+'/5';
+  document.getElementById('level-name').textContent=levels[Math.min(Math.floor(exScores.reduce((a,b)=>a+b,0)/8),4)];
+}
+function showEx(i){
+  document.querySelectorAll('.exercise').forEach((el,j)=>el.classList.toggle('active',j===i));
+  document.querySelectorAll('.tab-btn').forEach((el,j)=>el.classList.toggle('active',j===i));
+}
+function norm(s){return s.trim().replace(/\s+/g,' ').replace(/[.?!,]$/,'').toLowerCase();}
+function showResult(id,ok,total,idx){
+  const el=document.getElementById(id), pct=ok/total;
+  el.classList.add('show');
+  if(pct===1)  {el.className='result-msg show good';el.textContent='Mission complete! '+ok+'/'+total+' correct!';}
+  else if(pct>=.6){el.className='result-msg show ok';el.textContent='Not bad! '+ok+'/'+total+' — keep going, cadet!';}
+  else         {el.className='result-msg show bad';el.textContent=ok+'/'+total+' — check the red answers and try again.';}
+  updateScore(idx,ok);
+}
+
+/* EX 1 */
+const fillData=[
+  {pre:'The rocket',      verb:'went',  hint:'go',    post:'to Mars.'},
+  {pre:'Astronaut Max',   verb:'saw',   hint:'see',   post:'a big star.'},
+  {pre:'The crew',        verb:'ate',   hint:'eat',   post:'space food.'},
+  {pre:'Commander Lena',  verb:'wrote', hint:'write', post:'a message to Earth.'},
+  {pre:'They',            verb:'drank', hint:'drink', post:'water on the ship.'},
+  {pre:'The robot',       verb:'made',  hint:'make',  post:'a map of the Moon.'},
+  {pre:'Mission Control', verb:'sent',  hint:'send',  post:'a new signal.'},
+  {pre:'The satellite',   verb:'flew',  hint:'fly',   post:'past Jupiter.'},
+];
+function buildFill(){
+  document.getElementById('fill-list').innerHTML=fillData.map((d,i)=>`
+    <div class="card"><div class="sentence">
+      ${d.pre}
+      <input type="text" id="f${i}" placeholder="V2" autocomplete="off" style="width:100px">
+      ${d.post} <span class="hint-pill">${d.hint}</span>
+    </div></div>`).join('');
+}
+function checkFill(){
+  let ok=0;
+  fillData.forEach((d,i)=>{
+    const inp=document.getElementById('f'+i),v=inp.value.trim().toLowerCase();
+    v===d.verb?(inp.classList.add('correct'),inp.classList.remove('wrong'),ok++):(inp.classList.add('wrong'),inp.classList.remove('correct'));
+  });
+  showResult('fill-result',ok,fillData.length,0);
+}
+
+/* EX 2 */
+const transformData=[
+  {aff:'The alien went to our ship.',      neg:"The alien didn't go to our ship.",       q:'Did the alien go to our ship?'},
+  {aff:'They found water on the Moon.',    neg:"They didn't find water on the Moon.",    q:'Did they find water on the Moon?'},
+  {aff:'The robot made a big noise.',      neg:"The robot didn't make a big noise.",     q:'Did the robot make a big noise?'},
+  {aff:'Our ship left the space station.', neg:"Our ship didn't leave the space station.", q:'Did our ship leave the space station?'},
+];
+function buildTransform(){
+  document.getElementById('transform-list').innerHTML=transformData.map((d,i)=>`
+    <div class="card" style="margin-bottom:14px">
+      <div class="transform-original">+ ${d.aff}</div>
+      <div class="transform-fields">
+        <div class="field-row"><span class="field-label lbl-neg">–</span>
+          <input type="text" id="tn${i}" placeholder="didn't + V1..." autocomplete="off"></div>
+        <div class="field-row"><span class="field-label lbl-q">?</span>
+          <input type="text" id="tq${i}" placeholder="Did...?" autocomplete="off"></div>
+      </div>
+    </div>`).join('');
+}
+function checkTransform(){
+  let ok=0,total=transformData.length*2;
+  transformData.forEach((d,i)=>{
+    const ni=document.getElementById('tn'+i),qi=document.getElementById('tq'+i);
+    norm(ni.value)===norm(d.neg)?(ni.classList.add('correct'),ni.classList.remove('wrong'),ok++):(ni.classList.add('wrong'),ni.classList.remove('correct'));
+    norm(qi.value)===norm(d.q)?(qi.classList.add('correct'),qi.classList.remove('wrong'),ok++):(qi.classList.add('wrong'),qi.classList.remove('correct'));
+  });
+  showResult('transform-result',ok,total,1);
+}
+
+/* EX 3 */
+const whData=[
+  {html:'<span class="highlight">Max</span> went to the Moon.',                    answer:'Who went to the Moon?',              hint:'Who...'},
+  {html:'They ate <span class="highlight">pizza</span>.',                           answer:'What did they eat?',                 hint:'What...'},
+  {html:'She went to <span class="highlight">Mars</span>.',                         answer:'Where did she go?',                  hint:'Where...'},
+  {html:'The rocket left <span class="highlight">at 6 a.m.</span>',                answer:'When did the rocket leave?',         hint:'When...'},
+  {html:'He bought <span class="highlight">three</span> space suits.',             answer:'How many space suits did he buy?',    hint:'How many...'},
+  {html:'They went to space <span class="highlight">because it was fun</span>.',   answer:'Why did they go to space?',          hint:'Why...'},
+];
+function buildWh(){
+  document.getElementById('wh-list').innerHTML=whData.map((d,i)=>`
+    <div class="card">
+      <div class="wh-sentence">${d.html}</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="hint-pill">${d.hint}</span>
+        <input type="text" id="wh${i}" placeholder="${d.hint}" autocomplete="off" style="flex:1">
+      </div>
+    </div>`).join('');
+}
+function checkWh(){
+  let ok=0;
+  whData.forEach((d,i)=>{
+    const inp=document.getElementById('wh'+i);
+    norm(inp.value)===norm(d.answer)?(inp.classList.add('correct'),inp.classList.remove('wrong'),ok++):(inp.classList.add('wrong'),inp.classList.remove('correct'));
+  });
+  showResult('wh-result',ok,whData.length,2);
+}
+
+/* EX 4 — A1 simple sentence halves */
+const matchPairs=[
+  {left:'Max went to the rocket',       right:'and saw the Moon.'},
+  {left:'She ate space food',           right:'and drank some water.'},
+  {left:'The robot came to the crew',   right:'and made a loud noise.'},
+  {left:'They found a new planet',      right:'and took many photos.'},
+  {left:'The commander woke up early',  right:'and went to the control room.'},
+  {left:'The crew sang a song',         right:'and felt very happy.'},
+  {left:'He wrote a message',           right:'and sent it to Earth.'},
+  {left:'The rocket left the station',  right:'and flew to Mars.'},
+];
+let matchSelected=null, matchDone=0;
+function buildMatch(){
+  const sh=[...matchPairs].sort(()=>Math.random()-.5);
+  document.getElementById('match-left').innerHTML=matchPairs.map((d,i)=>`<div class="match-card" id="ml${i}" onclick="selectLeft(${i})">${d.left}</div>`).join('');
+  document.getElementById('match-right').innerHTML=sh.map((d,i)=>{
+    const orig=matchPairs.indexOf(d);
+    return`<div class="match-card" id="mr${i}" data-orig="${orig}" onclick="selectRight(${i})">${d.right}</div>`;
+  }).join('');
+}
+function selectLeft(i){
+  if(document.getElementById('ml'+i).classList.contains('matched'))return;
+  document.querySelectorAll('#match-left .match-card').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('ml'+i).classList.add('selected'); matchSelected=i;
+}
+function selectRight(i){
+  if(matchSelected===null)return;
+  const rEl=document.getElementById('mr'+i);
+  if(rEl.classList.contains('matched'))return;
+  if(parseInt(rEl.dataset.orig)===matchSelected){
+    const lEl=document.getElementById('ml'+matchSelected);
+    lEl.classList.remove('selected'); lEl.classList.add('matched','pulse-green');
+    rEl.classList.add('matched'); matchSelected=null; matchDone++;
+    document.getElementById('match-count').textContent=matchDone;
+    if(matchDone===matchPairs.length){
+      document.getElementById('match-status').innerHTML='<span style="color:var(--neon-green);font-family:Orbitron,monospace;font-size:13px">&#128640; All pairs found! Amazing!</span>';
+      updateScore(3,matchPairs.length);
+    }
+  } else {
+    rEl.classList.add('wrong-flash');
+    document.getElementById('ml'+matchSelected).classList.add('wrong-flash');
+    setTimeout(()=>{
+      rEl.classList.remove('wrong-flash');
+      const l=document.getElementById('ml'+matchSelected); if(l)l.classList.remove('wrong-flash');
+    },500);
+  }
+}
+
+/* EX 5 — A1 simple story */
+const storyParts=[
+  {t:'Yesterday, astronaut Sam '},{b:'woke',id:'s0'},
+  {t:' up early. He '},{b:'went',id:'s1'},
+  {t:' to the window. He '},{b:'saw',id:'s2'},
+  {t:' the Earth. It '},{b:'was',id:'s3'},
+  {t:' very big and blue. Sam '},{b:'took',id:'s4'},
+  {t:' a photo. Then he '},{b:'ate',id:'s5'},
+  {t:' breakfast. He '},{b:'drank',id:'s6'},
+  {t:' some tea. After that he '},{b:'wrote',id:'s7'},
+  {t:' in his diary. In the evening he '},{b:'sang',id:'s8'},
+  {t:' a song. It '},{b:'was',id:'s9'},
+  {t:' a great day in space!'},
+];
+const wordBank=['woke','went','saw','was','took','ate','drank','wrote','sang','was'];
+function buildStory(){
+  document.getElementById('word-bank').innerHTML=wordBank.map(w=>`<span class="word-chip">${w}</span>`).join('');
+  document.getElementById('story-box').innerHTML=storyParts.map(p=>
+    p.t?p.t:`<input type="text" id="${p.id}" placeholder="..." autocomplete="off">`
+  ).join('');
+}
+function checkStory(){
+  let ok=0;
+  storyParts.filter(p=>p.b).forEach(p=>{
+    const inp=document.getElementById(p.id); if(!inp)return;
+    inp.value.trim().toLowerCase()===p.b?(inp.classList.add('correct'),inp.classList.remove('wrong'),ok++):(inp.classList.add('wrong'),inp.classList.remove('correct'));
+  });
+  showResult('story-result',ok,storyParts.filter(p=>p.b).length,4);
+}
+
+buildFill(); buildTransform(); buildWh(); buildMatch(); buildStory();
+</script>
+</body>
+</html>
